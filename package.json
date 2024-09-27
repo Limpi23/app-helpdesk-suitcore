@@ -1,13 +1,12 @@
 {
-  "name": "electrovite-react",
-  "productName": "ElectroVite",
+  "name": "suitcore",
+  "productName": "SuitCore",
   "version": "1.2.0",
-  "description": "A prebuilt project for creating desktop apps with Electron, React, TypeScript & super fast hot-reload of Vite.",
+  "description": "Suitcore",
   "main": ".vite/build/main.js",
   "license": "MIT",
   "author": {
-    "name": "guasam",
-    "url": "https://github.com/guasam"
+    "name": "suitcore"
   },
   "keywords": [
     "electrovite",
@@ -53,7 +52,9 @@
   },
   "dependencies": {
     "electron-squirrel-startup": "^1.0.0",
+    "electron-updater": "^6.3.4",
     "react": "^18.2.0",
-    "react-dom": "^18.2.0"
+    "react-dom": "^18.2.0",
+    "sweetalert2": "^11.14.1"
   }
 }

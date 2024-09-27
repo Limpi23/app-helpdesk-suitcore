@@ -5,15 +5,22 @@ const rootDir = process.cwd();
 module.exports = {
   packagerConfig: {
     asar: false,
-    executableName: 'ElectroVite',
-    appCopyright: 'Copyright (C) 2023 Guasam, ElectroVite',
+    executableName: 'Suitcore',
+    appCopyright: 'Copyright (C) 2024, Suitcore',
     icon: path.resolve('assets/favicon.ico'),
   },
   rebuildConfig: {},
   makers: [
     {
       name: '@electron-forge/maker-squirrel',
-      config: {},
+      config: {
+        name: 'Suitcore',
+        setupExe: 'Suitcore-Installer.exe', 
+        setupIcon: path.resolve('assets/favicon.ico'),  
+        noMsi: true,  
+        outputDirectory: path.resolve(rootDir, 'out/make/squirrel.windows'),  
+        loadingGif: path.resolve('assets/loading.gif'),  // Opcional: GIF de carga para el instalador
+      },
     },
     {
       name: '@electron-forge/maker-zip',
