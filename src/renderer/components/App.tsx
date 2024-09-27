@@ -153,7 +153,7 @@ const App = () => {
           height={20}
           className='footer-icon'
         />
-        <p className='footer-text'>Versión 1.0.0</p>
+        <p className='footer-text'>Versión 1.1.0</p>
       </footer>
     </div>
   );

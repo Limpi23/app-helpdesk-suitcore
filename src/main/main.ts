@@ -1,5 +1,6 @@
-import { app, BrowserWindow } from 'electron';
+import { app, BrowserWindow, Tray, Menu } from 'electron';
 import path from 'path';
+import { autoUpdater } from 'electron-updater';
 
 /** Handle creating/removing shortcuts on Windows when installing/uninstalling. */
 if (require('electron-squirrel-startup')) {
@@ -10,6 +11,8 @@ if (require('electron-squirrel-startup')) {
  * Main window instance.
  */
 let mainWindow: BrowserWindow | null;
+let tray: Tray | null;
+let isQuiting = false;
 declare const MAIN_WINDOW_VITE_DEV_SERVER_URL: string;
 declare const MAIN_WINDOW_VITE_NAME: string;
 
@@ -18,8 +21,49 @@ declare const MAIN_WINDOW_VITE_NAME: string;
  * initialization and is ready to create browser windows.
  * Some APIs can only be used after this event occurs.
  */
-app.on('ready', createMainWindow);
+app.on('ready', () => {
+  createMainWindow();
 
+  // Configuración de la bandeja
+  tray = new Tray(path.resolve('assets/favicon.ico'));
+  const contextMenu = Menu.buildFromTemplate([
+    {
+      label: 'Mostrar',
+      click: () => {
+        mainWindow?.show();
+      },
+    },
+    {
+      label: 'Salir',
+      click: () => {
+        isQuiting = true; // Indicamos que estamos cerrando la aplicación
+        app.quit();
+      },
+    },
+  ]);
+
+  tray.setToolTip('Suitcore');
+  tray.setContextMenu(contextMenu);
+
+  tray.on('click', () => {
+    mainWindow?.show();
+  });
+
+  autoUpdater.checkForUpdatesAndNotify();
+
+  autoUpdater.on('update-available', () => {
+    console.log('Una nueva actualización está disponible.');
+  });
+
+  autoUpdater.on('update-downloaded', () => {
+    console.log('La actualización ha sido descargada.');
+    autoUpdater.quitAndInstall();
+  });
+
+  autoUpdater.on('error', (error) => {
+    console.error('Error durante la actualización:', error);
+  });
+});
 /**
  * Emitted when the application is activated. Various actions can
  * trigger this event, such as launching the application for the first time,
@@ -69,14 +113,11 @@ function createMainWindow() {
     webPreferences: {
       nodeIntegration: false,
       contextIsolation: true,
-      nodeIntegrationInWorker: false,
-      nodeIntegrationInSubFrames: false,
       preload: path.join(__dirname, 'preload.js'),
       sandbox: false,
     },
   });
 
-  // Load the index.html of the app window.
   if (MAIN_WINDOW_VITE_DEV_SERVER_URL) {
     mainWindow.loadURL(MAIN_WINDOW_VITE_DEV_SERVER_URL);
   } else {
@@ -85,15 +126,16 @@ function createMainWindow() {
     );
   }
 
-  // Show window when its ready to
   mainWindow.on('ready-to-show', () => {
     if (mainWindow) mainWindow.show();
   });
 
-  // Close all windows when main window is closed
-  mainWindow.on('close', () => {
-    mainWindow = null;
-    app.quit();
+  // Minimiza a la bandeja en lugar de cerrar
+  mainWindow.on('close', (event) => {
+    if (!isQuiting) {
+      event.preventDefault();
+      mainWindow?.hide();
+    }
   });
 
   return mainWindow;

@@ -30,6 +30,15 @@
   "config": {
     "forge": "./tools/forge/forge.config.js"
   },
+  "build": {
+    "publish": [
+      {
+        "provider": "github",
+        "owner": "Limpi23",
+        "repo": "app-helpdesk-suitcore"
+      }
+    ]
+  },
   "devDependencies": {
     "@electron-forge/cli": "^6.2.1",
     "@electron-forge/maker-deb": "^6.2.1",
