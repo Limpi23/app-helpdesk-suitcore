@@ -36,7 +36,7 @@ app.on('ready', () => {
     {
       label: 'Salir',
       click: () => {
-        isQuiting = true; // Indicamos que estamos cerrando la aplicación
+        isQuiting = true; 
         app.quit();
       },
     },
