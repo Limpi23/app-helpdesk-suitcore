@@ -2,6 +2,7 @@ import image from '$assets/technical.png';
 import suit from '$assets/favicon.ico';
 import React, { useState } from 'react';
 import Swal from 'sweetalert2';
+import { createTicket } from '../../api/ticket.services';
 
 const App = () => {
   const [formData, setFormData] = useState({
@@ -45,53 +46,49 @@ const App = () => {
     }
   };
 
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+  e.preventDefault();
 
-    if (!errors.email && !errors.phone && formData.message) {
-      fetch('https://formspree.io/f/xkgwdnyn', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(formData),
-      })
-        .then((response) => {
-          if (response.ok) {
-            Swal.fire({
-              icon: 'success',
-              title: '¡Enviado!',
-              text: 'Formulario enviado con éxito. Nos comunicaremos con usted en breve.',
-              confirmButtonText: 'Ok',
-            });
-            setFormData({ email: '', phone: '', message: '' });
-          } else {
-            Swal.fire({
-              icon: 'error',
-              title: 'Error',
-              text: 'Hubo un problema al enviar el formulario.',
-              confirmButtonText: 'Ok',
-            });
-          }
-        })
-        .catch((error) => {
-          Swal.fire({
-            icon: 'error',
-            title: 'Error',
-            text: 'Error al enviar el formulario.',
-            confirmButtonText: 'Ok',
-          });
-          console.error('Error:', error);
+  if (!errors.email && !errors.phone && formData.message) {
+    try {
+      //TODO: ver que hacer con el ticket 
+      const { data, status, message } = await createTicket(formData);
+
+      if (status === 200 || status === 201) {
+        Swal.fire({
+          icon: 'success',
+          title: '¡Enviado!',
+          text: 'Formulario enviado con éxito. Nos comunicaremos con usted en breve.',
+          confirmButtonText: 'Ok',
         });
-    } else {
+        setFormData({ email: '', phone: '', message: '' });
+      } else {
+        Swal.fire({
+          icon: 'info',
+          title: 'Información',
+          text: message || 'Tu ticket fue enviado, pero revisa más detalles en tu bandeja de entrada.',
+          confirmButtonText: 'Ok',
+        });
+      }
+    } catch (error: any) {
       Swal.fire({
-        icon: 'warning',
-        title: 'Campos inválidos',
-        text: 'Por favor, corrige los errores antes de enviar.',
+        icon: 'error',
+        title: 'Error',
+        text: error.message || 'Hubo un problema al enviar el formulario.',
         confirmButtonText: 'Ok',
       });
+      console.error('Error:', error);
     }
-  };
+  } else {
+    Swal.fire({
+      icon: 'warning',
+      title: 'Campos inválidos',
+      text: 'Por favor, corrige los errores antes de enviar.',
+      confirmButtonText: 'Ok',
+    });
+  }
+};
+ 
 
   return (
     <div className='app-container'>
@@ -153,7 +150,7 @@ const App = () => {
           height={20}
           className='footer-icon'
         />
-        <p className='footer-text'>Versión 1.1.0</p>
+        <p className='footer-text'>Versión 1.2.0</p>
       </footer>
     </div>
   );

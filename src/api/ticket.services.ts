@@ -26,9 +26,25 @@ export const getTicketById = async (id: string) => {
 export const createTicket = async (ticketData: any) => {
   try {
     const response = await axios.post(endpoint, ticketData);
-    return response.data;
-  } catch (error) {
+    return {
+      data: response.data,
+      status: response.status,
+      message: response.statusText,
+    };
+  } catch (error: any) {
     console.error('Error creating ticket', error);
-    throw error;
+
+    if (error.response) {
+      throw {
+        message: error.response.statusText,
+        status: error.response.status,
+        data: error.response.data, 
+      };
+    } else {
+      throw {
+        message: 'Error de red o servidor no disponible.',
+        status: null,
+      };
+    }
   }
 };
